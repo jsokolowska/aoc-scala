@@ -10,13 +10,12 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val cal = new Calorie
-    println(cal.countMaxCalories(readLines(fileName)))
-    println(cal.countGetTop3Calories(readLines(fileName)))
+    println(cal.countMaxCalories(readAsString(fileName)))
+    println(cal.countGetTop3Calories(readAsString(fileName)))
   }
 
-  def readLines(fileName: String): Try[List[String]]
+  def readAsString(fileName: String): Try[String]
   =
     Using(Source.fromFile(fileName)) { bufferedSource =>
-      bufferedSource.getLines.toList
-    }
+      bufferedSource.mkString    }
 }
