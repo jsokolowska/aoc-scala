@@ -3,16 +3,17 @@ package jsokolowska.aoc
 import jsokolowska.aoc.day01.Calorie
 import jsokolowska.aoc.day02.RockPaperScissors
 import jsokolowska.aoc.day03.Backpack
+import jsokolowska.aoc.day04.CampAssignment
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day03/input.txt"
+  val fileName = "src/main/resources/day04/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val rps = new Backpack
-    println(rps.getBadges(readLines(fileName)))
+    val cpa = new CampAssignment
+    println(cpa.findProblematicAssignments(readLines(fileName)))
     //println(rps.chooseSymbols(readLines(fileName)))
   }
 
