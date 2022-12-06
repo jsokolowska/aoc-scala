@@ -5,17 +5,18 @@ import jsokolowska.aoc.day02.RockPaperScissors
 import jsokolowska.aoc.day03.Backpack
 import jsokolowska.aoc.day04.CampAssignment
 import jsokolowska.aoc.day05.SupplyStacks
+import jsokolowska.aoc.day06.Tuning
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day04/input.txt"
+  val fileName = "src/main/resources/day06/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val cpa = new SupplyStacks
+    val cpa = new Tuning
 
-    println(cpa.rearrangeCrates())
+    println(cpa.partOne(readAsString(fileName).get))
     //println(rps.chooseSymbols(readLines(fileName)))
   }
 
