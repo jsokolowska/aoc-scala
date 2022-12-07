@@ -6,17 +6,18 @@ import jsokolowska.aoc.day03.Backpack
 import jsokolowska.aoc.day04.CampAssignment
 import jsokolowska.aoc.day05.SupplyStacks
 import jsokolowska.aoc.day06.Tuning
+import jsokolowska.aoc.day07.CountFiles
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day06/input.txt"
+  val fileName = "src/main/resources/day07/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val cpa = new Tuning
+    val cpa = new CountFiles
 
-    println(cpa.partOne(readAsString(fileName).get))
+    println(cpa.parseDirectoryTree(readLines(fileName).get))
     //println(rps.chooseSymbols(readLines(fileName)))
   }
 
