@@ -7,17 +7,18 @@ import jsokolowska.aoc.day04.CampAssignment
 import jsokolowska.aoc.day05.SupplyStacks
 import jsokolowska.aoc.day06.Tuning
 import jsokolowska.aoc.day07.CountFiles
+import jsokolowska.aoc.day08.TreeHouse
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day07/input.txt"
+  val fileName = "src/main/resources/day08/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val cpa = new CountFiles
+    val cpa = new TreeHouse
 
-    println(cpa.parseDirectoryTree(readLines(fileName).get))
+    println(cpa.partTwo(readLines(fileName).get))
     //println(rps.chooseSymbols(readLines(fileName)))
   }
 
