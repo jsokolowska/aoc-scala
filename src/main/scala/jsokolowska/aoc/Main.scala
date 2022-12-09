@@ -8,15 +8,16 @@ import jsokolowska.aoc.day05.SupplyStacks
 import jsokolowska.aoc.day06.Tuning
 import jsokolowska.aoc.day07.CountFiles
 import jsokolowska.aoc.day08.TreeHouse
+import jsokolowska.aoc.day09.RopeChase
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day08/input.txt"
+  val fileName = "src/main/resources/day09/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val cpa = new TreeHouse
+    val cpa = new RopeChase
 
     println(cpa.partTwo(readLines(fileName).get))
     //println(rps.chooseSymbols(readLines(fileName)))
