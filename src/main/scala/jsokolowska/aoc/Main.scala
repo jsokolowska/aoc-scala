@@ -16,12 +16,12 @@ import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day11/test.txt"
+  val fileName = "src/main/resources/day11/input.txt"
 
   def main(args: Array[String]): Unit = {
     val cpa = new KeepAway
 
-    println(cpa.partOne(readLines(fileName).get))
+    println(cpa.partTwo(readLines(fileName).get))
   }
 
   def readAsString(fileName: String): Try[String]

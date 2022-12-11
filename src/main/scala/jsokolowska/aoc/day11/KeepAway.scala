@@ -6,9 +6,11 @@ import scala.collection.mutable.ListBuffer
 
 class KeepAway {
   private var allPossibleDividends: Set[Int] = Set.empty
+
   enum Operation:
     case Add, Multiply, SelfMultiply, SelfAdd
-    def perform(value:Int, arg: Int): Int = {
+
+    def perform(value: Int, arg: Int): Int = {
       this match
         case Operation.Add => value + arg
         case Operation.Multiply => value * arg
@@ -16,33 +18,62 @@ class KeepAway {
         case Operation.SelfMultiply => value * value
     }
 
-  abstract class Item (protected var initialValue: Int):
-    protected var moduloMap: Map[Int, Int]  = Map.empty
-    def isDivisibleBy(dividend: Int): Boolean = {
-      moduloMap(dividend) == 0
-    }
-    def init (): Unit = {
-      moduloMap = allPossibleDividends.map(div => (div, initialValue % div)).toMap
-    }
-    def inspect(operation: Operation,  argument: Int): Item
+  abstract class Item( var initialValue: Int):
+    def isDivisibleBy(dividend: Int): Boolean
+
+    def init(): Unit
+
+    def inspect(operation: Operation, argument: Int): Item
 
   class SimpleItem(initV: Int) extends Item(initV):
-    override def inspect(operation: Operation,  argument: Int): Item = {
+    private var moduloMap: Map[Int, Int] = Map.empty
+
+    override def init(): Unit = {
+      moduloMap = allPossibleDividends.map(div => (div, initialValue % div)).toMap
+    }
+
+    //override def init(): Unit = {}
+    override def inspect(operation: Operation, argument: Int): Item = {
       //update all modulos & value
       initialValue = operation.perform(initialValue, argument) / 3
-      moduloMap = moduloMap.map(mapItem => (mapItem._1, operation.perform(mapItem._2, argument) / 3))
+      moduloMap = moduloMap.map(
+        mapItem => (mapItem._1, operation.perform(mapItem._2, argument) / 3 % mapItem._1)
+      )
       this
     }
-    override def toString: String = initialValue.toString
-  class ItemWithoutOverflow(_initialValue: Int) extends Item(_initialValue):
-      override def inspect(operation: Operation, argument: Int): Item = {
-        //update all modulos
-        moduloMap = moduloMap.map(mapItem => (mapItem._1, operation.perform(mapItem._2, argument) % mapItem._1))
-        this
-      }
-      override def toString: String = s"$initialValue = $moduloMap"
 
-  private class Test(var divident: Int, var monkeyTrue : Int, var monkeyFalse: Int):
+    override def isDivisibleBy(dividend: Int): Boolean = {
+      val noover = moduloMap(dividend) == 0
+      val directCalc = initialValue % dividend == 0
+      if (directCalc != noover) {
+        print("a")
+      }
+      directCalc
+    }
+
+    override def toString: String = initialValue.toString
+
+  class ItemWithoutOverflow(_initialValue: Int) extends Item(_initialValue):
+    private var moduloMap: Map[Int, Int] = Map.empty
+
+    override def init(): Unit = {
+      moduloMap = allPossibleDividends.map(div => (div, initialValue % div)).toMap
+    }
+
+    override def inspect(operation: Operation, argument: Int): Item = {
+      //update all modulos
+      //initialValue = operation.perform(initialValue, argument) / 3
+      moduloMap = moduloMap.map(mapItem => (mapItem._1, operation.perform(mapItem._2, argument) % mapItem._1))
+      this
+    }
+
+    override def isDivisibleBy(dividend: Int): Boolean = {
+      moduloMap(dividend) == 0
+    }
+
+    override def toString: String = s"$initialValue = $moduloMap"
+
+  private class Test(var divident: Int, var monkeyTrue: Int, var monkeyFalse: Int):
     def getDestination(item: Item): Int = {
       if (item.isDivisibleBy(divident)) monkeyTrue
       else monkeyFalse
@@ -51,44 +82,73 @@ class KeepAway {
   private class Monkey(var operation: (Operation, Int),
                        var items: List[Item],
                        var test: Test) {
-    var activityCounter = 0
+    var activityCounter: Long = 0
 
-    def round(): List[(Int, Item)] ={
+    def round(): List[(Int, Item)] = {
       val throwInstructions = items.map(item => {
+        val cp = item.initialValue
         val updatedItem = inspect(item)
+        val dest = test.getDestination(updatedItem)
+        //println(s"\t\t$cp, after update $updatedItem, throwing to $dest")
         (test.getDestination(updatedItem), updatedItem)
       })
       items = List.empty
       throwInstructions
     }
 
-    def initAllItems():Unit = {
+    def initAllItems(): Unit = {
       items.foreach(_.init())
     }
 
     def catchItem(item: Item): Unit = {
       items = items.appended(item)
     }
-    private def inspect(item: Item):Item = {
+
+    private def inspect(item: Item): Item = {
       activityCounter += 1
       item.inspect(operation._1, operation._2)
     }
   }
 
-  def partOne(monkeyDescriptions: List[String]):Int = {
+  def partOne(monkeyDescriptions: List[String]): Long = {
     val monkeysUnsorted = monkeyDescriptions.grouped(7).map(monkeyDesc => {
       val id = monkeyDesc.head.split(" ")(1).split(":")(0).toInt
-      (id, parseSimpleMonkey(monkeyDesc.slice(1,6)))
+      (id, parseSimpleMonkey(monkeyDesc.slice(1, 6)))
     }).toMap
     // init all possible dividends
     allPossibleDividends = monkeysUnsorted.map(monkey => monkey._2.test.divident).toSet
-    val monkeys = ListMap(monkeysUnsorted.toSeq.sortBy(_._1):_*)
+    val monkeys = ListMap(monkeysUnsorted.toSeq.sortBy(_._1): _*)
     monkeys.foreachEntry((*, m) => m.initAllItems())
 
     0.until(20).foreach(idx => {
       println(s"Round $idx")
-      monkeys.foreach( (i, m) => println(s"$i : ${m.items}"))
-      for (m <- monkeys){
+      monkeys.foreach((i, m) => println(s"$i : ${m.activityCounter}"))
+      for (m <- monkeys) {
+        val throws = m._2.round()
+        throws.foreach(t => monkeys(t._1).catchItem(t._2))
+      }
+    })
+
+    val twoMostActive = monkeys.map(m => m._2.activityCounter).toList.sorted.reverse.take(2)
+    twoMostActive.head * twoMostActive(1)
+  }
+
+  //todo clean that up
+  def partTwo(monkeyDescriptions: List[String]): Long = {
+    val monkeysUnsorted = monkeyDescriptions.grouped(7).map(monkeyDesc => {
+      val id = monkeyDesc.head.split(" ")(1).split(":")(0).toInt
+      (id, parseMonkeyWithoutOverflow(monkeyDesc.slice(1, 6)))
+    }).toMap
+    // init all possible dividends
+    allPossibleDividends = monkeysUnsorted.map(monkey => monkey._2.test.divident).toSet
+    val monkeys = ListMap(monkeysUnsorted.toSeq.sortBy(_._1): _*)
+    monkeys.foreachEntry((*, m) => m.initAllItems())
+
+    0.until(10000).foreach(idx => {
+      //println(s"Round $idx")
+      //monkeys.foreach((i, m) => println(s"$i : ${m.activityCounter}"))
+      for (m <- monkeys) {
+        //println(s"${m._1} : ${m._2.items}")
         val throws = m._2.round()
         throws.foreach(t => monkeys(t._1).catchItem(t._2))
       }
@@ -105,7 +165,7 @@ class KeepAway {
     val items = monkeyDescription.head.split(": ")(1).split(", ").map(_.toInt).map(SimpleItem(_)).toList
     // parse operation
 
-    Monkey(parseOperation(monkeyDescription(1)), items, parseTest(monkeyDescription.slice(2,5)))
+    Monkey(parseOperation(monkeyDescription(1)), items, parseTest(monkeyDescription.slice(2, 5)))
   }
 
   private def parseMonkeyWithoutOverflow(monkeyDescription: List[String]): Monkey = {
