@@ -10,12 +10,13 @@ import jsokolowska.aoc.day07.CountFiles
 import jsokolowska.aoc.day08.TreeHouse
 import jsokolowska.aoc.day09.RopeChase
 import jsokolowska.aoc.day10.RegisterOperations
+import jsokolowska.aoc.day11.KeepAway
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day11/input.txt"
+  val fileName = "src/main/resources/day11/test.txt"
 
   def main(args: Array[String]): Unit = {
     val cpa = new KeepAway
