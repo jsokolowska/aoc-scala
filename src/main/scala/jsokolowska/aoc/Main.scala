@@ -9,18 +9,18 @@ import jsokolowska.aoc.day06.Tuning
 import jsokolowska.aoc.day07.CountFiles
 import jsokolowska.aoc.day08.TreeHouse
 import jsokolowska.aoc.day09.RopeChase
+import jsokolowska.aoc.day10.RegisterOperations
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day09/input.txt"
+  val fileName = "src/main/resources/day10/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val cpa = new RopeChase
+    val cpa = new RegisterOperations
 
     println(cpa.partTwo(readLines(fileName).get))
-    //println(rps.chooseSymbols(readLines(fileName)))
   }
 
   def readAsString(fileName: String): Try[String]
