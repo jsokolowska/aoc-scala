@@ -11,15 +11,16 @@ import jsokolowska.aoc.day08.TreeHouse
 import jsokolowska.aoc.day09.RopeChase
 import jsokolowska.aoc.day10.RegisterOperations
 import jsokolowska.aoc.day11.KeepAway
+import jsokolowska.aoc.day14.FallingSand
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day11/input.txt"
+  val fileName = "src/main/resources/day14/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val cpa = new KeepAway
+    val cpa = new FallingSand
 
     println(cpa.partTwo(readLines(fileName).get))
   }
