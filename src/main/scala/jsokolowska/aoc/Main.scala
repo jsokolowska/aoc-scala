@@ -12,17 +12,18 @@ import jsokolowska.aoc.day09.RopeChase
 import jsokolowska.aoc.day10.RegisterOperations
 import jsokolowska.aoc.day11.KeepAway
 import jsokolowska.aoc.day14.FallingSand
+import jsokolowska.aoc.day15.BeaconZone
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day14/input.txt"
+  val fileName = "src/main/resources/day15/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val cpa = new FallingSand
+    val cpa = new BeaconZone
 
-    println(cpa.partTwo(readLines(fileName).get))
+    println(cpa.partOne(readLines(fileName).get, 2000000))
   }
 
   def readAsString(fileName: String): Try[String]
