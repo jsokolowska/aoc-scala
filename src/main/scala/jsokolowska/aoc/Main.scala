@@ -25,7 +25,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val cpa =  RockTetris()
 
-    println(cpa.partOne(readAsString(fileName).get))
+    println(cpa.partTwo(readAsString(fileName).get))
   }
 
   def readAsString(fileName: String): Try[String]

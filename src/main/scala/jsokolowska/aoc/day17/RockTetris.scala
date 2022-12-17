@@ -4,9 +4,9 @@ import java.nio.file.WatchEvent.Kind
 import scala.collection.mutable
 
 class RockTetris {
-  private val xMin = 0
-  private val xMax = 7
-  private val busyCoords: Map[Int, mutable.Set[Int]] = xMin.until(xMax).map((_, mutable.Set(0))).toMap
+  private val xMin: BigInt = 0
+  private val xMax: BigInt = 7
+  private var busyCoords: Map[BigInt, mutable.Set[BigInt]] = xMin.until(xMax).map((_, mutable.Set(BigInt.int2bigInt(0)))).toMap
   private var jetStreams: String = ""
   private var jetIdx = 0
 
@@ -17,7 +17,7 @@ class RockTetris {
     case HLINE, PLUS, CORNER, VLINE, SQUARE
 
 
-  def partOne(input: String): Int = {
+  def partOne(input: String): BigInt = {
     val limit = 2022
     jetStreams = input
 
@@ -29,34 +29,45 @@ class RockTetris {
           case 2 => fall(Rock.CORNER)
           case 3 => fall(Rock.VLINE)
           case 4 => fall(Rock.SQUARE)
-
-        //printTower()
-        //println("\n")
       }
     )
 
     maxHeight()
   }
 
-  def printTower():Unit = {
-    val yMax = maxHeight() +1
-    0.to(yMax).reverse.foreach( yIdx => {
-      val occY = busyCoords.filter((k,v) => v.contains(yIdx)).keySet
-      val line = 0.until(xMax).map(xIdx => {
-        if(occY.contains(xIdx)){
-          '#'
-        }else{
-          '.'
-        }
-      }).mkString
-      println(line)
+  def partTwo(input: String): BigInt = {
+    val limit = 1000000000000L
+    var idx = 0L
+    jetStreams = input
+
+    while (idx < limit){
+      if (idx % 1000 == 0) {
+        prune(idx)
+      }
+      if (idx % 100000 == 0) {
+        println(s"[${idx /100000}/${limit/100000}]")
+      }
+      idx % 5 match
+        case 0 => fall(Rock.HLINE)
+        case 1 => fall(Rock.PLUS)
+        case 2 => fall(Rock.CORNER)
+        case 3 => fall(Rock.VLINE)
+        case 4 => fall(Rock.SQUARE)
+      idx += 1
+
     }
 
-    )
+    maxHeight()
   }
 
+  def prune(idx: Long): Unit = {
+    val pruneThreshold = 50
+    busyCoords = busyCoords.map(mapEntry => (mapEntry._1, mapEntry._2.toList.sorted.reverse.take(pruneThreshold).to(mutable.Set) ))
+  }
+
+
   private def fall(kind: Rock): Unit = {
-    var coords: (Int, Int) = (2, maxHeight() + 4)
+    var coords: (BigInt, BigInt)= (2, maxHeight() + 4)
     coords = moveSides(kind, coords, jetStreams(jetIdx % jetStreams.length))
     jetIdx += 1
 
@@ -69,29 +80,28 @@ class RockTetris {
     stop(kind, coords)
   }
 
-  private def moveSides(kind: Rock, coords: (Int, Int), dirChar: Char): (Int, Int) = dirChar match
+  private def moveSides(kind: Rock, coords: (BigInt, BigInt), dirChar: Char): (BigInt, BigInt) = dirChar match
     case '>' => moveOne(Direction.RIGHT, kind, coords)
     case '<' => moveOne(Direction.LEFT, kind, coords)
 
-  private def moveOne(direction: Direction, kind: Rock, coords: (Int, Int)): (Int, Int) = {
-    //println(s"\t$kind moves from $coords one to $direction")
+  private def moveOne(direction: Direction, kind: Rock, coords: (BigInt, BigInt)): (BigInt, BigInt) = {
     direction match
       case Direction.DOWN => (coords._1, coords._2 - 1)
       case Direction.RIGHT =>
-        if(canMoveRight(kind, coords)){
-          (coords._1 +1, coords._2)
-        }else{
+        if (canMoveRight(kind, coords)) {
+          (coords._1 + 1, coords._2)
+        } else {
           coords
         }
       case Direction.LEFT =>
-        if(canMoveLeft(kind, coords)){
-          (coords._1 -1, coords._2)
-        }else{
+        if (canMoveLeft(kind, coords)) {
+          (coords._1 - 1, coords._2)
+        } else {
           coords
         }
   }
 
-  private def canMoveRight(kind: Rock, coords: (Int, Int)): Boolean = {
+  private def canMoveRight(kind: Rock, coords: (BigInt, BigInt)): Boolean = {
     kind match
       case Rock.HLINE =>
         isFree(coords._1 + 4, coords._2)
@@ -119,10 +129,10 @@ class RockTetris {
 
   }
 
-  private def canMoveLeft(kind: Rock, coords: (Int, Int)): Boolean = {
+  private def canMoveLeft(kind: Rock, coords: (BigInt, BigInt)): Boolean = {
     kind match
       case Rock.HLINE =>
-        isFree(coords._1 -1, coords._2)
+        isFree(coords._1 - 1, coords._2)
 
       case Rock.VLINE =>
         isFree(coords._1 - 1, coords._2) &
@@ -131,22 +141,22 @@ class RockTetris {
           isFree(coords._1 - 1, coords._2 + 3)
 
       case Rock.SQUARE =>
-        isFree(coords._1 -1 , coords._2) &
-          isFree(coords._1 -1, coords._2 + 1)
+        isFree(coords._1 - 1, coords._2) &
+          isFree(coords._1 - 1, coords._2 + 1)
 
 
       case Rock.CORNER =>
-        isFree(coords._1 -1, coords._2) &
-          isFree(coords._1 +1, coords._2 + 1) &
+        isFree(coords._1 - 1, coords._2) &
+          isFree(coords._1 + 1, coords._2 + 1) &
           isFree(coords._1 + 1, coords._2 + 2)
 
       case Rock.PLUS =>
         isFree(coords._1, coords._2) &
-          isFree(coords._1 -1, coords._2 + 1) &
+          isFree(coords._1 - 1, coords._2 + 1) &
           isFree(coords._1, coords._2 + 2)
   }
 
-  private def canFall(kind: Rock, coords: (Int, Int)): Boolean = {
+  private def canFall(kind: Rock, coords: (BigInt, BigInt)): Boolean = {
     kind match
       case Rock.HLINE =>
         isFree(coords._1, coords._2 - 1) &
@@ -159,7 +169,7 @@ class RockTetris {
 
       case Rock.SQUARE =>
         isFree(coords._1, coords._2 - 1) &
-        isFree(coords._1 + 1, coords._2 - 1)
+          isFree(coords._1 + 1, coords._2 - 1)
 
       case Rock.CORNER =>
         isFree(coords._1, coords._2 - 1) &
@@ -172,16 +182,16 @@ class RockTetris {
           isFree(coords._1 + 1, coords._2 - 1)
   }
 
-  private def isFree(xPos: Int, yPos: Int): Boolean = {
-    if(xPos < xMin | xPos >= xMax) return false
+  private def isFree(xPos: BigInt, yPos: BigInt): Boolean = {
+    if (xPos < xMin | xPos >= xMax) return false
     !busyCoords(xPos).contains(yPos)
   }
 
-  private def maxHeight(): Int = busyCoords.values.flatten.max
+  private def maxHeight(): BigInt = busyCoords.values.flatten.max
 
-  private def occupy(xPos: Int, yPos: Int) = busyCoords(xPos).add(yPos)
+  private def occupy(xPos: BigInt, yPos: BigInt) = busyCoords(xPos).add(yPos)
 
-  private def stop(kind: Rock, coords: (Int, Int)): Unit = {
+  private def stop(kind: Rock, coords: (BigInt, BigInt)): Unit = {
     kind match
       case Rock.SQUARE =>
         occupy(coords._1, coords._2)
