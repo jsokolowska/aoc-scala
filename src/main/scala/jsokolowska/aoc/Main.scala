@@ -15,17 +15,18 @@ import jsokolowska.aoc.day14.FallingSand
 import jsokolowska.aoc.day15.BeaconZone
 import jsokolowska.aoc.day16.Volcano
 import jsokolowska.aoc.day17.RockTetris
+import jsokolowska.aoc.day19.Geodes
 
 import scala.io.Source
 import scala.util.{Try, Using}
 
 object Main {
-  val fileName = "src/main/resources/day17/input.txt"
+  val fileName = "src/main/resources/day19/input.txt"
 
   def main(args: Array[String]): Unit = {
-    val cpa =  RockTetris()
+    val part =  Geodes()
 
-    println(cpa.partTwo(readAsString(fileName).get))
+    println(part.partOne(readLines(fileName).get))
   }
 
   def readAsString(fileName: String): Try[String]
